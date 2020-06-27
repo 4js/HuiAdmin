@@ -1,5 +1,5 @@
 export const ACCESS_TOKEN = 'Access-Token'
-
+export const ADMIN_ID = 'ADMIN_ID'
 export const SIDEBAR_TYPE = 'sidebar_type'
 export const TOGGLE_MOBILE_TYPE = 'is_mobile'
 export const TOGGLE_NAV_THEME = 'nav_theme'

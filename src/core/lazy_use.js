@@ -50,6 +50,7 @@ import Viser from 'viser-vue'
 
 // ext library
 import VueCropper from 'vue-cropper'
+import VueStorage from 'vue-ls'
 import Dialog from '@/components/Dialog'
 import MultiTab from '@/components/MultiTab'
 import PageLoading from '@/components/PageLoading'
@@ -97,6 +98,7 @@ Vue.use(PageHeader)
 Vue.use(Result)
 Vue.use(Statistic)
 Vue.use(Descriptions)
+Vue.use(VueStorage)
 
 Vue.prototype.$confirm = Modal.confirm
 Vue.prototype.$message = message

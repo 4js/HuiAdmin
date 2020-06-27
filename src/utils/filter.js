@@ -18,3 +18,8 @@ Vue.filter('dayjs', function (dataStr, pattern = 'YYYY-MM-DD HH:mm:ss') {
 Vue.filter('moment', function (dataStr, pattern = 'YYYY-MM-DD HH:mm:ss') {
   return moment(dataStr).format(pattern)
 })
+
+Vue.filter('formateTime', function (string) {
+  const date = Number(string) * 1000
+  return date ? moment(date).format('YYYY-MM-DD HH:mm:ss') : '-'
+})

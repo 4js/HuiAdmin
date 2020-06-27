@@ -1,9 +1,11 @@
+import Vue from 'vue'
 import axios from 'axios'
 import store from '@/store'
-import storage from 'store'
+// import storage from 'store'
+import qs from 'qs'
 import notification from 'ant-design-vue/es/notification'
 import { VueAxios } from './axios'
-import { ACCESS_TOKEN } from '@/store/mutation-types'
+import { ACCESS_TOKEN, ADMIN_ID } from '@/store/mutation-types'
 
 // 创建 axios 实例
 const request = axios.create({
@@ -16,8 +18,7 @@ const request = axios.create({
 const errorHandler = (error) => {
   if (error.response) {
     const data = error.response.data
-    // 从 localstorage 获取 token
-    const token = storage.get(ACCESS_TOKEN)
+    const token = Vue.ls.get(ACCESS_TOKEN)
     if (error.response.status === 403) {
       notification.error({
         message: 'Forbidden',
@@ -43,18 +44,39 @@ const errorHandler = (error) => {
 
 // request interceptor
 request.interceptors.request.use(config => {
-  const token = storage.get(ACCESS_TOKEN)
-  // 如果 token 存在
-  // 让每个请求携带自定义 token 请根据实际情况自行修改
+  const token = Vue.ls.get(ACCESS_TOKEN)
+  const adminId = Vue.ls.get(ADMIN_ID)
+  console.log('token', token)
   if (token) {
-    config.headers['Access-Token'] = token
+    config.data = Object.assign({ key_token: token, admin_id: adminId }, config.data) // 让每个请求携带自定义 token 请根据实际情况自行修改
   }
+  config.data = qs.stringify(config.data)
   return config
 }, errorHandler)
 
 // response interceptor
 request.interceptors.response.use((response) => {
-  return response.data
+  if (response.data.code === 1) {
+    return response.data
+  } else if (response.data.code === '-1003') {
+    notification.error({
+      message: '登录失效',
+      description: '请重新登录'
+    })
+    store.dispatch('Logout').then(() => {
+      setTimeout(() => {
+        window.location.reload()
+      }, 1500)
+    })
+    // setTimeout(() => {
+    //   window.location.reload()
+    // }, 1500)
+  } else {
+    notification.error({
+      message: 'Forbidden',
+      description: response.data.message
+    })
+  }
 }, errorHandler)
 
 const installer = {

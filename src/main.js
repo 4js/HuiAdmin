@@ -11,13 +11,16 @@ import { VueAxios } from './utils/request'
 import ProLayout, { PageHeaderWrapper } from '@ant-design-vue/pro-layout'
 import themePluginConfig from '../config/themePluginConfig'
 
+import { Dialog } from '@/components'
+import { FormModel, Cascader, Tree } from 'ant-design-vue'
+
 // mock
 // WARNING: `mockjs` NOT SUPPORT `IE` PLEASE DO NOT USE IN `production` ENV.
-import './mock'
+// import './mock'
 
 import bootstrap from './core/bootstrap'
 import './core/lazy_use'
-import './permission' // permission control
+// import './permission' // permission control
 import './utils/filter' // global filter
 import './global.less'
 
@@ -25,6 +28,10 @@ Vue.config.productionTip = false
 
 // mount axios to `Vue.$http` and `this.$http`
 Vue.use(VueAxios)
+Vue.use(Dialog)
+Vue.use(Cascader)
+Vue.use(Tree)
+Vue.use(FormModel)
 Vue.component('pro-layout', ProLayout)
 Vue.component('page-header-wrapper', PageHeaderWrapper)
 

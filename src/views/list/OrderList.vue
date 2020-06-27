@@ -11,19 +11,34 @@
       >
         <a-row :gutter="24">
           <a-col :md="6" :sm="24">
-            <a-form-model-item label="姓名或手机号" prop="user_name_tel">
-              <a-input v-model="queryParam.user_name_tel" placeholder="请输入用户手机号" />
+            <a-form-model-item label="商品名称" prop="goods_names">
+              <a-input v-model="queryParam.goods_names" placeholder="请输入商品名称" />
+            </a-form-model-item>
+          </a-col>
+          <a-col :md="6" :sm="24">
+            <a-form-model-item label="支付编号" prop="pay_sn">
+              <a-input v-model="queryParam.pay_sn" placeholder="请输入支付编号" />
             </a-form-model-item>
           </a-col>
           <!-- <a-col :md="6" :sm="24">
-            <a-form-model-item label="绑定时间" prop="user_itime">
+            <a-form-model-item label="支付编号" prop="pay_sn">
+              <a-input v-model="queryParam.pay_sn" placeholder="请输入支付编号" />
+            </a-form-model-item>
+          </a-col> -->
+          <a-col :md="6" :sm="24">
+            <a-form-model-item label="用户名/手机号" prop="user_name_tel">
+              <a-input v-model="queryParam.user_name_tel" placeholder="请输入用户名/手机号" />
+            </a-form-model-item>
+          </a-col>
+          <a-col :md="6" :sm="24">
+            <a-form-model-item label="创建时间" prop="itime">
               <a-range-picker
-                v-model="queryParam.user_itime"
+                v-model="queryParam.itime"
                 style="width: 100%"
                 format="YYYY-MM-DD"
               />
             </a-form-model-item>
-          </a-col> -->
+          </a-col>
           <a-col :md="6" :sm="24">
             <span class="table-page-search-submitButtons">
               <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
@@ -37,7 +52,8 @@
     <s-table
       ref="table"
       size="default"
-      row-key="user_id"
+      row-key="order_id"
+      :scroll="{ x: 2000 }"
       :columns="columns"
       :data="getList"
       show-pagination="auto"
@@ -52,6 +68,11 @@
         <span v-if="text==='1'">启用</span>
         <span v-else>停用</span>
       </template>
+      <span slot="action">
+        <a>查看</a>
+        <a-divider type="vertical" />
+        <a>发货</a>
+      </span>
     </s-table>
   </a-card>
 </template>
@@ -62,7 +83,7 @@ import qs from 'qs'
 import moment from 'moment'
 import { STable } from '@/components'
 import { ACCESS_TOKEN, ADMIN_ID } from '@/store/mutation-types'
-import { getUserList } from '@/api/list'
+import { getOrderList } from '@/api/list'
 
 export default {
   name: 'TableList',
@@ -76,41 +97,64 @@ export default {
       mdl: {},
       // 查询参数
       queryParam: {
-        user_name_tel: ''
+        goods_names: '',
+        pay_sn: '',
+        user_name_tel: '',
+        itime: []
       },
       // 表头
       columns: [
          {
           title: '序号',
           align: 'center',
+          width: 80,
+          fixed: 'left',
           customRender: (text, record, index) => index + 1
         },
-        // {
-        //   title: '用户id',
-        //   dataIndex: 'user_id'
-        // },
         {
-          title: '姓名',
+          title: '订单编号',
+          align: 'center',
+          width: 200,
+          dataIndex: 'order_sn'
+        },
+        {
+          title: '商品名',
+          align: 'center',
+          dataIndex: 'goods_names'
+        },
+        {
+          title: '商品编号',
+          align: 'center',
+          dataIndex: 'goods_sns'
+        },
+        {
+          title: '支付编号',
+          align: 'center',
+          width: 300,
+          dataIndex: 'pay_sn'
+        },
+        {
+          title: '用户昵称',
           align: 'center',
           dataIndex: 'user_name'
         },
         {
           title: '手机号',
           align: 'center',
-          dataIndex: 'tel'
+          dataIndex: 'user_tel'
         },
         {
-          title: '省份',
+          title: '总金额(元)',
           align: 'center',
-          dataIndex: 'province_name'
+          dataIndex: 'total_pay_money'
         },
         {
-          title: '城市',
+          title: '订单状态',
           align: 'center',
-          dataIndex: 'city_name'
+          dataIndex: 'order_status_name'
         },
         {
-          title: '新增时间',
+          title: '创建时间',
           dataIndex: 'itime',
           align: 'center',
           scopedSlots: { customRender: 'itime' }
@@ -118,6 +162,8 @@ export default {
         {
           title: '操作',
           align: 'center',
+          fixed: 'right',
+          width: 140,
           dataIndex: 'action',
           scopedSlots: { customRender: 'action' }
         }
@@ -139,17 +185,17 @@ export default {
     },
     getList (parameter) {
       parameter = Object.assign(parameter, this.queryParam)
-      // const { user_itime: userItime, area_id: areaID } = parameter
-      // if (userItime && userItime.length > 0) {
-      //   parameter.user_itime_start = moment(moment(userItime[0]).format('YYYY-MM-DD 00:00:00')).valueOf() / 1000
-      //   parameter.user_itime_end = moment(moment(userItime[1]).format('YYYY-MM-DD 23:59:59')).valueOf() / 1000
-      // } else {
-      //   parameter.user_itime_start = ''
-      //   parameter.user_itime_end = ''
-      // }
-      // delete parameter.user_itime
+      const { itime } = parameter
+      if (itime && itime.length > 0) {
+        parameter.itime_start = moment(moment(itime[0]).format('YYYY-MM-DD 00:00:00')).valueOf() / 1000
+        parameter.itime_end = moment(moment(itime[1]).format('YYYY-MM-DD 23:59:59')).valueOf() / 1000
+      } else {
+        parameter.itime_start = ''
+        parameter.itime_end = ''
+      }
+      delete parameter.itime
       // if (areaID.length) parameter.area_id = areaID[areaID.length - 1]
-      return getUserList(parameter).then(res => {
+      return getOrderList(parameter).then(res => {
         return res.data
       })
     },
