@@ -11,8 +11,8 @@
       >
         <a-row :gutter="24">
           <a-col :md="6" :sm="24">
-            <a-form-model-item label="姓名或手机号" prop="user_name_tel">
-              <a-input v-model="queryParam.user_name_tel" placeholder="请输入用户手机号" />
+            <a-form-model-item label="商品名或编号" prop="goods_name_sn">
+              <a-input v-model="queryParam.goods_name_sn" placeholder="请输入商品名或编号" />
             </a-form-model-item>
           </a-col>
           <!-- <a-col :md="6" :sm="24">
@@ -37,7 +37,7 @@
     <s-table
       ref="table"
       size="default"
-      row-key="user_id"
+      row-key="goods_id"
       :columns="columns"
       :data="getList"
       show-pagination="auto"
@@ -47,6 +47,18 @@
       </template>
       <template slot="puser_name" slot-scope="puser_name">
         <span>{{ puser_name || '-' }}</span>
+      </template>
+      <template slot="coupon_status" slot-scope="coupon_status">
+        <span>{{ coupon_status == '2' ? '是' : '-' }}</span>
+      </template>
+      <template slot="banner_status" slot-scope="banner_status">
+        <span>{{ banner_status == '2' ? '是' : '-' }}</span>
+      </template>
+      <template slot="publish_status" slot-scope="publish_status">
+        <span>{{ publish_status == '2' ? '上架' : '-' }}</span>
+      </template>
+      <template slot="quality_goods_status" slot-scope="quality_goods_status">
+        <span>{{ quality_goods_status == '2' ? '是' : '-' }}</span>
       </template>
       <template slot="status" slot-scope="text">
         <span v-if="text==='1'">启用</span>
@@ -62,7 +74,7 @@ import qs from 'qs'
 import moment from 'moment'
 import { STable } from '@/components'
 import { ACCESS_TOKEN, ADMIN_ID } from '@/store/mutation-types'
-import { getUserList } from '@/api/list'
+import { getGoodsList } from '@/api/list'
 
 export default {
   name: 'TableList',
@@ -76,7 +88,7 @@ export default {
       mdl: {},
       // 查询参数
       queryParam: {
-        user_name_tel: ''
+        goods_name_sn: ''
       },
       // 表头
       columns: [
@@ -90,27 +102,66 @@ export default {
         //   dataIndex: 'user_id'
         // },
         {
-          title: '姓名',
+          title: '商品名',
           align: 'center',
-          dataIndex: 'user_name'
+          dataIndex: 'goods_name'
         },
         {
-          title: '手机号',
+          title: '商品编号',
           align: 'center',
-          dataIndex: 'tel'
+          dataIndex: 'goods_sn'
         },
         {
-          title: '省份',
+          title: '价格',
           align: 'center',
-          dataIndex: 'province_name'
+          dataIndex: 'goods_price'
         },
         {
-          title: '城市',
+          title: '原价',
           align: 'center',
-          dataIndex: 'city_name'
+          dataIndex: 'goods_original_price'
         },
         {
-          title: '新增时间',
+          title: '型号',
+          align: 'center',
+          dataIndex: 'model'
+        },
+        {
+          title: '规格',
+          align: 'center',
+          dataIndex: 'specification'
+        },
+        {
+          title: 'Banner',
+          align: 'center',
+          dataIndex: 'banner_status',
+          scopedSlots: { customRender: 'banner_status' }
+        },
+        {
+          title: '精品',
+          align: 'center',
+          dataIndex: 'quality_goods_status',
+          scopedSlots: { customRender: 'quality_goods_status' }
+        },
+        {
+          title: '参与优惠',
+          align: 'center',
+          dataIndex: 'coupon_status',
+          scopedSlots: { customRender: 'coupon_status' }
+        },
+        {
+          title: '状态',
+          align: 'center',
+          dataIndex: 'publish_status',
+          scopedSlots: { customRender: 'publish_status' }
+        },
+        {
+          title: '排序',
+          align: 'center',
+          dataIndex: 'sort'
+        },
+        {
+          title: '创建时间',
           dataIndex: 'itime',
           align: 'center',
           scopedSlots: { customRender: 'itime' }
@@ -149,7 +200,7 @@ export default {
       // }
       // delete parameter.user_itime
       // if (areaID.length) parameter.area_id = areaID[areaID.length - 1]
-      return getUserList(parameter).then(res => {
+      return getGoodsList(parameter).then(res => {
         return res.data
       })
     },

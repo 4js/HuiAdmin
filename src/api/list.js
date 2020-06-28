@@ -8,43 +8,6 @@
  */
 import request from '@/utils/request'
 
-// 员工列表
-export function getMemberList (data) {
-  return request({
-    url: '?c=member&a=index&v=manager&site=useractivity',
-    method: 'post',
-    data
-  })
-}
-
-// 领导列表
-export function getLeaderList (data) {
-  return request({
-    url: '?c=leader&a=index&v=manager&site=useractivity',
-    method: 'post',
-    data
-  })
-}
-
-// 新增或修改领导
-export function updateLeader (data) {
-  const affix = data.leader_id ? 'updateinfo' : 'addinfo'
-  return request({
-    url: `?c=leader&a=${affix}&v=manager&site=useractivity`,
-    method: 'post',
-    data
-  })
-}
-
-// 导入员工
-export function addJobNumber (data) {
-  return request({
-    url: '?c=member&a=importjobnumber&v=manager&site=useractivity',
-    method: 'post',
-    data
-  })
-}
-
 // 订单列表
 export function getOrderList (data) {
   return request({
@@ -63,19 +26,38 @@ export function getUserList (data) {
   })
 }
 
-// 区域公告列表
-export function getNoticeList (data) {
+// 编辑或者更新用户
+export function updateUserInfo (data) {
+  const affix = data.user_id ? 'edit' : 'add'
   return request({
-    url: '?c=areanotice&a=index&v=manager&site=useractivity',
+    url: `/?c=user&a=${affix}info&v=manager&site=user`,
     method: 'post',
     data
   })
 }
 
-// 更新公告
-export function updateNotice (data) {
+// 商品列表
+export function getGoodsList (data) {
   return request({
-    url: '?c=areanotice&a=updateinfo&v=manager&site=useractivity',
+    url: '/?c=goods&a=index&v=manager&site=goods',
+    method: 'post',
+    data
+  })
+}
+
+// 区域列表
+export function getAreaList (data) {
+  return request({
+    url: '/?c=user&a=arealist&v=manager&site=user',
+    method: 'post',
+    data
+  })
+}
+
+// 财务列表
+export function getFinanceList (data) {
+  return request({
+    url: '/?c=statistics&a=index&v=manager&site=goods',
     method: 'post',
     data
   })

@@ -1,11 +1,11 @@
 // eslint-disable-next-line
 import { UserLayout, BasicLayout, BlankLayout } from '@/layouts'
-import { bxAnaalyse } from '@/core/icons'
+// import { bxAnaalyse } from '@/core/icons'
 
-const RouteView = {
-  name: 'RouteView',
-  render: (h) => h('router-view')
-}
+// const RouteView = {
+//   name: 'RouteView',
+//   render: (h) => h('router-view')
+// }
 
 export const asyncRouterMap = [
 
@@ -14,22 +14,22 @@ export const asyncRouterMap = [
     name: 'index',
     component: BasicLayout,
     meta: { title: 'menu.home' },
-    redirect: '/dashboard/workplace',
+    redirect: '/userList',
     children: [
       // dashboard
-      {
-        path: '/dashboard',
-        name: 'dashboard',
-        redirect: '/dashboard/workplace',
-        component: RouteView,
-        meta: { title: 'menu.dashboard', keepAlive: true, icon: bxAnaalyse, permission: [ 'dashboard' ] },
-        children: [
-          {
-            path: '/dashboard/analysis/:pageNo([1-9]\\d*)?',
-            name: 'Analysis',
-            component: () => import('@/views/dashboard/Analysis'),
-            meta: { title: 'menu.dashboard.analysis', keepAlive: false, permission: [ 'dashboard' ] }
-          }
+      // {
+      //   path: '/dashboard',
+      //   name: 'dashboard',
+      //   redirect: '/dashboard/workplace',
+      //   component: RouteView,
+      //   meta: { title: '仪表盘', keepAlive: true, icon: bxAnaalyse, permission: [ 'dashboard' ] },
+      //   children: [
+      //     {
+      //       path: '/dashboard/analysis/:pageNo([1-9]\\d*)?',
+      //       name: 'Analysis',
+      //       component: () => import('@/views/dashboard/Analysis'),
+      //       meta: { title: '分析', keepAlive: false, permission: [ 'dashboard' ] }
+      //     }
           // // 外部链接
           // {
           //   path: 'https://www.baidu.com/',
@@ -42,13 +42,20 @@ export const asyncRouterMap = [
           //   component: () => import('@/views/dashboard/Workplace'),
           //   meta: { title: 'menu.dashboard.workplace', keepAlive: true, permission: [ 'dashboard' ] }
           // }
-        ]
+      //   ]
+      // },
+
+      {
+        path: '/dashboard',
+        name: 'dashboard',
+        component: () => import('@/views/dashboard/Analysis'),
+        meta: { title: '仪表盘', icon: 'user', keepAlive: true, permission: [ 'form' ] }
       },
 
       {
         path: '/userList',
         name: 'userList',
-        component: () => import('@/views/list/TableList'),
+        component: () => import('@/views/list/UserList'),
         meta: { title: '用户列表', icon: 'user', keepAlive: true, permission: [ 'form' ] }
       },
 
