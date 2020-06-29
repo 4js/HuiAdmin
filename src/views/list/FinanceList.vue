@@ -11,8 +11,15 @@
       >
         <a-row :gutter="24">
           <a-col :md="6" :sm="24">
-            <a-form-model-item label="姓名或手机号" prop="user_name_tel">
-              <a-input v-model="queryParam.user_name_tel" placeholder="请输入用户手机号" />
+            <a-form-model-item label="状态" prop="order_status">
+              <a-select v-model="queryParam.order_status" placeholder="请选择状态">
+                <a-select-option value="1">待支付</a-select-option>
+                <a-select-option value="2">待发货</a-select-option>
+                <a-select-option value="3">已退款</a-select-option>
+                <a-select-option value="4">已发货</a-select-option>
+                <a-select-option value="5">已完成</a-select-option>
+                <a-select-option value="-3">待退款</a-select-option>
+              </a-select>
             </a-form-model-item>
           </a-col>
           <!-- <a-col :md="6" :sm="24">
@@ -62,7 +69,7 @@ import qs from 'qs'
 import moment from 'moment'
 import { STable } from '@/components'
 import { ACCESS_TOKEN, ADMIN_ID } from '@/store/mutation-types'
-import { getUserList } from '@/api/list'
+import { getFinanceList } from '@/api/list'
 
 export default {
   name: 'TableList',
@@ -76,7 +83,7 @@ export default {
       mdl: {},
       // 查询参数
       queryParam: {
-        user_name_tel: ''
+        order_status: '1'
       },
       // 表头
       columns: [
@@ -138,7 +145,7 @@ export default {
       this.$refs.table.refresh(true)
     },
     getList (parameter) {
-      parameter = Object.assign(parameter, this.queryParam)
+      // parameter = Object.assign(parameter, this.queryParam)
       // const { user_itime: userItime, area_id: areaID } = parameter
       // if (userItime && userItime.length > 0) {
       //   parameter.user_itime_start = moment(moment(userItime[0]).format('YYYY-MM-DD 00:00:00')).valueOf() / 1000
@@ -149,7 +156,8 @@ export default {
       // }
       // delete parameter.user_itime
       // if (areaID.length) parameter.area_id = areaID[areaID.length - 1]
-      return getUserList(parameter).then(res => {
+      return getFinanceList(parameter).then(res => {
+        console.log(res)
         return res.data
       })
     },

@@ -60,13 +60,16 @@
     <a-modal v-model="addUserModal" title="编辑" @ok="handleOk" okText="确定" cancelText="取消">
       <a-form-model ref="addRoleForm" :model="form" :rules="rules" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-form-model-item label="姓名" prop="user_name">
-          <a-input v-model="form.user_name" />
+          <a-input v-model="form.user_name" :maxLength="11"/>
         </a-form-model-item>
         <a-form-model-item label="手机号" prop="tel">
-          <a-input v-model="form.tel" />
+          <a-input v-model="form.tel" :maxLength="11"/>
+        </a-form-model-item>
+        <a-form-model-item label="地区" prop="area">
+          <a-cascader v-model="form.area" :options="areaOptions" :load-data="loadData" placeholder="地区"/>
         </a-form-model-item>
         <a-form-model-item label="抵扣券" prop="coupon_money">
-          <a-input-number :step="1" :min="1" :max="100000" :precision="0" v-model="form.coupon_money" />
+          <a-input-number :step="1" :min="0" :max="100000" :precision="0" v-model="form.coupon_money" />
         </a-form-model-item>
       </a-form-model>
     </a-modal>
@@ -102,10 +105,6 @@ export default {
           align: 'center',
           customRender: (text, record, index) => index + 1
         },
-        // {
-        //   title: '用户id',
-        //   dataIndex: 'user_id'
-        // },
         {
           title: '姓名',
           align: 'center',
@@ -140,32 +139,56 @@ export default {
         }
       ],
       data: [],
-      areaList: [],
       // 编辑或者新增
       labelCol: { span: 4 },
       wrapperCol: { span: 18 },
       addUserModal: false,
       modalTitle: '新增用户',
-      rules: {
-        notice_content: [{ required: true, message: '请输入公告内容', trigger: 'blur' }]
-      },
       form: {
         user_name: '',
         tel: '',
+        area: [],
         coupon_money: 0
-      }
+      },
+      rules: {
+        user_name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+        tel: [{ required: true, message: '请输入手机号', trigger: 'blur' }],
+        area: [{ required: true, message: '请选择区域', trigger: 'blur' }]
+      },
+      areaOptions: []
     }
   },
   created () {
-    getAreaList().then(res => {
-      console.log('res', res)
-      // this.areaList = res.data
+    getAreaList({ area_id: 100000 }).then(res => {
+      const arr = res.data.list.map(item => {
+        return {
+          label: item.area_name,
+          value: item.area_id,
+          isLeaf: false
+        }
+      })
+      this.areaOptions = arr
     })
   },
   methods: {
     reset () {
       this.$refs.form.resetFields()
       this.$refs.table.refresh(true)
+    },
+    loadData (selectedOptions) {
+      const targetOption = selectedOptions[selectedOptions.length - 1]
+      targetOption.loading = true
+      getAreaList({ area_id: targetOption.value }).then(res => {
+        const arr = res.data.list.map(item => {
+          return {
+            label: item.area_name,
+            value: item.area_id
+          }
+        })
+        targetOption.loading = false
+        targetOption.children = arr
+        this.areaOptions = [...this.areaOptions]
+      })
     },
     getList (parameter) {
       parameter = Object.assign(parameter, this.queryParam)
@@ -224,6 +247,11 @@ export default {
       this.$refs.addRoleForm.validate(valid => {
         if (valid) {
           const userData = Object.assign({}, this.form)
+          userData.coupon_money = +userData.coupon_money
+          userData.province_id = userData.area[0]
+          userData.city_id = userData.area[1]
+          userData.county_id = userData.area[1]
+          delete userData.area
           updateUserInfo(userData).then(res => {
             if (res) {
               this.$refs.table.refresh()

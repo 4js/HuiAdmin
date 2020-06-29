@@ -65,6 +65,22 @@
         <span v-else>停用</span>
       </template>
     </s-table>
+    <a-modal v-model="addUserModal" title="编辑" @ok="handleOk" okText="确定" cancelText="取消">
+      <a-form-model ref="addRoleForm" :model="form" :rules="rules" :label-col="labelCol" :wrapper-col="wrapperCol">
+        <a-form-model-item label="姓名" prop="user_name">
+          <a-input v-model="form.user_name" :maxLength="11"/>
+        </a-form-model-item>
+        <a-form-model-item label="手机号" prop="tel">
+          <a-input v-model="form.tel" :maxLength="11"/>
+        </a-form-model-item>
+        <a-form-model-item label="地区" prop="area">
+          <a-cascader v-model="form.area" :options="areaOptions" :load-data="loadData" placeholder="地区"/>
+        </a-form-model-item>
+        <a-form-model-item label="抵扣券" prop="coupon_money">
+          <a-input-number :step="1" :min="0" :max="100000" :precision="0" v-model="form.coupon_money" />
+        </a-form-model-item>
+      </a-form-model>
+    </a-modal>
   </a-card>
 </template>
 
@@ -174,7 +190,22 @@ export default {
         }
       ],
       data: [],
-      areaList: []
+      // 添加框
+      labelCol: { span: 4 },
+      wrapperCol: { span: 18 },
+      addUserModal: false,
+      modalTitle: '新增用户',
+      form: {
+        user_name: '',
+        tel: '',
+        area: [],
+        coupon_money: 0
+      },
+      rules: {
+        user_name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+        tel: [{ required: true, message: '请输入手机号', trigger: 'blur' }],
+        area: [{ required: true, message: '请选择区域', trigger: 'blur' }]
+      }
     }
   },
   created () {

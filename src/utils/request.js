@@ -46,7 +46,6 @@ const errorHandler = (error) => {
 request.interceptors.request.use(config => {
   const token = Vue.ls.get(ACCESS_TOKEN)
   const adminId = Vue.ls.get(ADMIN_ID)
-  console.log('token', token)
   if (token) {
     config.data = Object.assign({ key_token: token, admin_id: adminId }, config.data) // 让每个请求携带自定义 token 请根据实际情况自行修改
   }
