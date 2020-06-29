@@ -77,7 +77,7 @@
           <a-cascader v-model="form.area" :options="areaOptions" :load-data="loadData" placeholder="地区"/>
         </a-form-model-item>
         <a-form-model-item label="抵扣券" prop="coupon_money">
-          <a-input-number :step="1" :min="0" :max="100000" :precision="0" v-model="form.coupon_money" />
+          <a-input-number :step="1" :min="0" :max="100000" :precision="2" v-model="form.coupon_money" />
         </a-form-model-item>
       </a-form-model>
     </a-modal>
@@ -113,10 +113,6 @@ export default {
           align: 'center',
           customRender: (text, record, index) => index + 1
         },
-        // {
-        //   title: '用户id',
-        //   dataIndex: 'user_id'
-        // },
         {
           title: '商品名',
           align: 'center',

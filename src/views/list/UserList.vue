@@ -69,7 +69,7 @@
           <a-cascader v-model="form.area" :options="areaOptions" :load-data="loadData" placeholder="地区"/>
         </a-form-model-item>
         <a-form-model-item label="抵扣券" prop="coupon_money">
-          <a-input-number :step="1" :min="0" :max="100000" :precision="0" v-model="form.coupon_money" />
+          <a-input-number :step="1" :min="0" :max="100000" :precision="2" v-model="form.coupon_money" />
         </a-form-model-item>
       </a-form-model>
     </a-modal>
@@ -247,10 +247,9 @@ export default {
       this.$refs.addRoleForm.validate(valid => {
         if (valid) {
           const userData = Object.assign({}, this.form)
-          userData.coupon_money = +userData.coupon_money
+          userData.coupon_money = parseFloat(userData.coupon_money).toFixed(2)
           userData.province_id = userData.area[0]
           userData.city_id = userData.area[1]
-          userData.county_id = userData.area[1]
           delete userData.area
           updateUserInfo(userData).then(res => {
             if (res) {
