@@ -44,7 +44,7 @@
     <s-table
       ref="table"
       size="default"
-      row-key="user_id"
+      row-key="goods_name"
       :columns="columns"
       :data="getList"
       show-pagination="auto"
@@ -97,36 +97,49 @@ export default {
         //   dataIndex: 'user_id'
         // },
         {
-          title: '姓名',
+          title: '商品名',
           align: 'center',
-          dataIndex: 'user_name'
+          dataIndex: 'goods_name'
         },
         {
-          title: '手机号',
+          title: '待支付',
           align: 'center',
-          dataIndex: 'tel'
+          dataIndex: 'wait_pay'
         },
         {
-          title: '省份',
+          title: '取消支付',
           align: 'center',
-          dataIndex: 'province_name'
+          dataIndex: 'cancel_pay'
         },
         {
-          title: '城市',
+          title: '已支付',
           align: 'center',
-          dataIndex: 'city_name'
+          dataIndex: 'complete_pay'
         },
         {
-          title: '新增时间',
+          title: '退款中',
           dataIndex: 'itime',
-          align: 'center',
-          scopedSlots: { customRender: 'itime' }
+          align: 'wait_refund'
         },
         {
-          title: '操作',
-          align: 'center',
-          dataIndex: 'action',
-          scopedSlots: { customRender: 'action' }
+          title: '已退款',
+          dataIndex: 'complete_refund',
+          align: 'center'
+        },
+        {
+          title: '已发货',
+          dataIndex: 'send_goods',
+          align: 'center'
+        },
+        {
+          title: '已完成',
+          dataIndex: 'complete_goods',
+          align: 'center'
+        },
+        {
+          title: '总计',
+          dataIndex: 'total_money',
+          align: 'center'
         }
       ],
       data: [],
@@ -145,19 +158,8 @@ export default {
       this.$refs.table.refresh(true)
     },
     getList (parameter) {
-      // parameter = Object.assign(parameter, this.queryParam)
-      // const { user_itime: userItime, area_id: areaID } = parameter
-      // if (userItime && userItime.length > 0) {
-      //   parameter.user_itime_start = moment(moment(userItime[0]).format('YYYY-MM-DD 00:00:00')).valueOf() / 1000
-      //   parameter.user_itime_end = moment(moment(userItime[1]).format('YYYY-MM-DD 23:59:59')).valueOf() / 1000
-      // } else {
-      //   parameter.user_itime_start = ''
-      //   parameter.user_itime_end = ''
-      // }
-      // delete parameter.user_itime
-      // if (areaID.length) parameter.area_id = areaID[areaID.length - 1]
+      parameter = Object.assign(parameter, this.queryParam)
       return getFinanceList(parameter).then(res => {
-        console.log(res)
         return res.data
       })
     },

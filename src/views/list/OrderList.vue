@@ -68,12 +68,45 @@
         <span v-if="text==='1'">启用</span>
         <span v-else>停用</span>
       </template>
-      <span slot="action">
-        <a>查看</a>
-        <a-divider type="vertical" />
-        <a>发货</a>
+      <span slot="action" slot-scope="text, scope">
+        <a @click="viewOrder(scope)">查看</a>
+        <a-divider v-if="scope.order_status === '2'" type="vertical" />
+        <a v-if="scope.order_status === '2'" @click="showFaModal(scope)">发货</a>
       </span>
     </s-table>
+    <a-modal v-model="showInfoModal" title="查看订单" :footer="null" width="1000px">
+      <a-descriptions title="订单信息">
+        <a-descriptions-item label="订单编号">{{ mdl.order_sn | fomateNotext }}</a-descriptions-item>
+        <a-descriptions-item label="支付编号">{{ mdl.pay_sn | fomateNotext }}</a-descriptions-item>
+        <a-descriptions-item label="订单状态"><a>{{ mdl.order_status | statusFilter }}</a></a-descriptions-item>
+        <a-descriptions-item label="用户名">{{ mdl.user_name | fomateNotext }}</a-descriptions-item>
+        <a-descriptions-item label="手机号">{{ mdl.tel | fomateNotext }}</a-descriptions-item>
+        <a-descriptions-item label="下单时间">{{ mdl.utime | fomateNotext }}</a-descriptions-item>
+        <a-descriptions-item label="优惠金额">{{ mdl.total_coupon_price }} 元</a-descriptions-item>
+        <a-descriptions-item label="运费">{{ mdl.total_area_price }} 元</a-descriptions-item>
+        <a-descriptions-item label="总金额">{{ mdl.total_pay_money }} 元</a-descriptions-item>
+      </a-descriptions>
+      <a-divider style="margin-bottom: 32px"/>
+      <a-descriptions title="物流信息">
+        <a-descriptions-item label="物流单号">{{ mdl.shipper_code | fomateNotext }}</a-descriptions-item>
+        <a-descriptions-item label="物流品牌">{{ mdl.shipper_code | codeFilter }}</a-descriptions-item>
+      </a-descriptions>
+      <p>收货地址:  {{ mdl.address }}</p>
+    </a-modal>
+    <a-modal v-model="faModal" title="发货" @ok="handleOk" okText="确定" cancelText="取消">
+      <a-form-model ref="faForm" :model="form" :rules="rules" :label-col="labelCol" :wrapper-col="wrapperCol">
+        <a-form-model-item label="物流公司" prop="shipper_code">
+          <a-select v-model="form.shipper_code" placeholder="请选择物流公司">
+            <a-select-option value="STO">申通快递</a-select-option>
+            <a-select-option value="YTO">圆通快递</a-select-option>
+            <a-select-option value="ZTO">中通快递</a-select-option>
+          </a-select>
+        </a-form-model-item>
+        <a-form-model-item label="物流单号" prop="waybill_number" placeholder="请输入物流单号">
+          <a-input v-model="form.waybill_number" :maxLength="25"/>
+        </a-form-model-item>
+      </a-form-model>
+    </a-modal>
   </a-card>
 </template>
 
@@ -83,7 +116,7 @@ import qs from 'qs'
 import moment from 'moment'
 import { STable } from '@/components'
 import { ACCESS_TOKEN, ADMIN_ID } from '@/store/mutation-types'
-import { getOrderList } from '@/api/list'
+import { getOrderList, faLogis } from '@/api/list'
 
 export default {
   name: 'TableList',
@@ -94,7 +127,6 @@ export default {
     return {
       roleType: Number(Vue.ls.get('ROLE_TYPE')),
       description: '列表使用场景：后台管理中的权限管理以及角色管理，可用于基于 RBAC 设计的角色权限控制，颗粒度细到每一个操作类型。',
-      mdl: {},
       // 查询参数
       queryParam: {
         goods_names: '',
@@ -169,7 +201,57 @@ export default {
         }
       ],
       data: [],
-      areaList: []
+      areaList: [],
+      // 查看详情
+      showInfoModal: false,
+      mdl: {},
+      // 发货
+      faModal: false,
+      form: {
+        shipper_code: '',
+        waybill_number: ''
+      },
+      labelCol: { span: 4 },
+      wrapperCol: { span: 18 },
+      rules: {
+        shipper_code: [{ required: true, message: '请选择物流公司', trigger: 'blur' }],
+        waybill_number: [{ required: true, message: '请输入物流单号', trigger: 'blur' }]
+      }
+    }
+  },
+  filters: {
+    statusFilter (status) {
+      if (status === '-1') {
+        return '已取消'
+      } else if (status === '1') {
+        return '待支付'
+      } else if (status === '-2') {
+        return '已删除'
+      } else if (status === '2') {
+        return '待发货'
+      } else if (status === '-3') {
+        return '退款中'
+      } else if (status === '3') {
+        return '已退款'
+      } else if (status === '4') {
+        return '待收货'
+      } else if (status === '5') {
+        return '已完成'
+      }
+      return '-'
+    },
+    codeFilter (code) {
+      if (code === 'STO') {
+        return '申通快递'
+      } else if (status === 'YTO') {
+        return '圆通快递'
+      } else if (status === 'ZTO') {
+        return '中通快递'
+      }
+      return '-'
+    },
+    fomateNotext (text) {
+      return text || '-'
     }
   },
   created () {
@@ -219,6 +301,34 @@ export default {
         url = qs.stringify(Object.assign({ key_token: token, admin_id: adminId }, parameter)) // 让每个请求携带自定义 token 请根据实际情况自行修改
       }
       window.open('http://test.service.agent.topasst.com/?c=user&a=index&v=manager&site=useractivity&' + url)
+    },
+    viewOrder (scope) {
+      this.showInfoModal = true
+      this.mdl = scope
+    },
+    showFaModal (scope) {
+      this.faModal = true
+      this.mdl = scope
+    },
+    handleOk () {
+      const { mdl, form } = this
+      this.$refs.faForm.validate(valid => {
+        if (valid) {
+          const { order_id: id } = mdl
+          const { shipper_code: code, waybill_number: number } = form
+          faLogis({
+            order_id: id,
+            shipper_code: code,
+            waybill_number: number
+          }).then(res => {
+            if (res) {
+              this.$refs.table.refresh()
+              this.$message.success('发货成功')
+              this.faModal = false
+            }
+          })
+        }
+      })
     }
   }
 }

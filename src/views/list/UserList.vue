@@ -126,6 +126,11 @@ export default {
           dataIndex: 'city_name'
         },
         {
+          title: '优惠券金额(元)',
+          align: 'center',
+          dataIndex: 'coupon_money'
+        },
+        {
           title: '新增时间',
           dataIndex: 'itime',
           align: 'center',
@@ -228,14 +233,37 @@ export default {
       window.open('http://test.service.agent.topasst.com/?c=user&a=index&v=manager&site=useractivity&' + url)
     },
     showApplyModal (user) {
+      const _this = this
       let modalTitle = '新增用户'
       let mdl = {}
       if (user) {
-        this.form = {
-          user_name: user.user_name,
-          tel: user.tel,
-          coupon_money: user.coupon_money
-        }
+        getAreaList({ area_id: user.province_id }).then(res => {
+          const arr = res.data.list.map(item => {
+            return {
+              label: item.area_name,
+              value: item.area_id
+            }
+          })
+          console.log(user.province_id)
+          let provinceIndex = 0
+          let province = {}
+          for (let i = 0, iLen = _this.areaOptions.length; i < iLen; i++) {
+            if (_this.areaOptions[i].value === user.province_id) {
+              provinceIndex = i
+              province = _this.areaOptions[i]
+            }
+          }
+          console.log(provinceIndex)
+          Vue.set(_this.areaOptions, provinceIndex, Object.assign(province, { children: arr }))
+          _this.$nextTick(() => {
+            _this.form = {
+              user_name: user.user_name,
+              tel: user.tel,
+              coupon_money: user.coupon_money,
+              area: [user.province_id, user.city_id]
+            }
+          })
+        })
         mdl = user
         modalTitle = '编辑用户'
       }
@@ -244,6 +272,7 @@ export default {
       this.addUserModal = true
     },
     handleOk () {
+      const { mdl } = this
       this.$refs.addRoleForm.validate(valid => {
         if (valid) {
           const userData = Object.assign({}, this.form)
@@ -251,10 +280,12 @@ export default {
           userData.province_id = userData.area[0]
           userData.city_id = userData.area[1]
           delete userData.area
+          // 编辑
+          if (mdl) userData.user_id = mdl.user_id
           updateUserInfo(userData).then(res => {
             if (res) {
               this.$refs.table.refresh()
-              this.$message.success('更新成功')
+              this.$message.success(mdl ? '更新成功' : '添加成功')
               this.addUserModal = false
             }
           })

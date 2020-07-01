@@ -62,3 +62,12 @@ export function getFinanceList (data) {
     data
   })
 }
+
+// 发货
+export function faLogis (data) {
+  return request({
+    url: '/?c=order&a=updatewaybillnumber&v=manager&site=goods',
+    method: 'post',
+    data
+  })
+}

@@ -251,6 +251,9 @@ export default {
         url = qs.stringify(Object.assign({ key_token: token, admin_id: adminId }, parameter)) // 让每个请求携带自定义 token 请根据实际情况自行修改
       }
       window.open('http://test.service.agent.topasst.com/?c=user&a=index&v=manager&site=useractivity&' + url)
+    },
+    handleOk () {
+      console.log(123)
     }
   }
 }

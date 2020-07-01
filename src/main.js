@@ -20,7 +20,7 @@ import { FormModel, Cascader, Tree } from 'ant-design-vue'
 
 import bootstrap from './core/bootstrap'
 import './core/lazy_use'
-// import './permission' // permission control
+import './permission' // permission control
 import './utils/filter' // global filter
 import './global.less'
 
