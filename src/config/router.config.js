@@ -67,6 +67,14 @@ export const asyncRouterMap = [
       },
 
       {
+        path: '/editGoods',
+        name: 'editGoods',
+        hidden: true,
+        component: () => import('@/views/list/editGoods'),
+        meta: { title: '编辑商品', icon: 'form', keepAlive: true, permission: [ 'form' ] }
+      },
+
+      {
         path: '/orderList',
         name: 'orderList',
         component: () => import('@/views/list/OrderList'),

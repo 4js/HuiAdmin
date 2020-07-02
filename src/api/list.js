@@ -28,7 +28,7 @@ export function getUserList (data) {
 
 // 编辑或者更新用户
 export function updateUserInfo (data) {
-  const affix = data.user_id ? 'edit' : 'add'
+  const affix = data.user_id ? 'update' : 'add'
   return request({
     url: `/?c=user&a=${affix}info&v=manager&site=user`,
     method: 'post',
@@ -40,6 +40,15 @@ export function updateUserInfo (data) {
 export function getGoodsList (data) {
   return request({
     url: '/?c=goods&a=index&v=manager&site=goods',
+    method: 'post',
+    data
+  })
+}
+
+// 添加商品
+export function addGoods (data) {
+  return request({
+    url: '/?c=goods&a=addinfo&v=manager&site=goods',
     method: 'post',
     data
   })

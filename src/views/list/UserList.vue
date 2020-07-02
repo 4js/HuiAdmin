@@ -46,6 +46,9 @@
       <template slot="itime" slot-scope="text">
         <span>{{ text | formateTime }}</span>
       </template>
+      <template slot="expire_time" slot-scope="text">
+        <span>{{ text | formateTime }}</span>
+      </template>
       <template slot="puser_name" slot-scope="puser_name">
         <span>{{ puser_name || '-' }}</span>
       </template>
@@ -70,6 +73,9 @@
         </a-form-model-item>
         <a-form-model-item label="抵扣券" prop="coupon_money">
           <a-input-number :step="1" :min="0" :max="100000" :precision="2" v-model="form.coupon_money" />
+        </a-form-model-item>
+        <a-form-model-item label="过期时间" prop="expire_time">
+          <a-date-picker v-model="form.expire_time" />
         </a-form-model-item>
       </a-form-model>
     </a-modal>
@@ -131,6 +137,12 @@ export default {
           dataIndex: 'coupon_money'
         },
         {
+          title: '过期时间',
+          align: 'center',
+          dataIndex: 'expire_time',
+          scopedSlots: { customRender: 'expire_time' }
+        },
+        {
           title: '新增时间',
           dataIndex: 'itime',
           align: 'center',
@@ -153,12 +165,14 @@ export default {
         user_name: '',
         tel: '',
         area: [],
+        expire_time: moment(new Date()),
         coupon_money: 0
       },
       rules: {
         user_name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
         tel: [{ required: true, message: '请输入手机号', trigger: 'blur' }],
-        area: [{ required: true, message: '请选择区域', trigger: 'blur' }]
+        area: [{ required: true, message: '请选择区域', trigger: 'blur' }],
+        expire_time: [{ required: true, message: '请选择过期时间', trigger: 'blur' }]
       },
       areaOptions: []
     }
@@ -259,6 +273,7 @@ export default {
             _this.form = {
               user_name: user.user_name,
               tel: user.tel,
+              expire_time: moment(new Date(user.expire_time * 1000)),
               coupon_money: user.coupon_money,
               area: [user.province_id, user.city_id]
             }
@@ -276,6 +291,7 @@ export default {
       this.$refs.addRoleForm.validate(valid => {
         if (valid) {
           const userData = Object.assign({}, this.form)
+          userData.expire_time = moment(moment(userData.expire_time).format('YYYY-MM-DD 00:00:00')).valueOf() / 1000
           userData.coupon_money = parseFloat(userData.coupon_money).toFixed(2)
           userData.province_id = userData.area[0]
           userData.city_id = userData.area[1]

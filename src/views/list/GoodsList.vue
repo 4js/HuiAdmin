@@ -27,7 +27,8 @@
           <a-col :md="6" :sm="24">
             <span class="table-page-search-submitButtons">
               <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
-              <a-button style="margin-left: 8px" @click="reset">重置</a-button>
+              <a-button style="margin: 0 8px" @click="reset">重置</a-button>
+              <a-button type="primary" @click="showModal()">新增</a-button>
               <!-- <a-button style="margin-left: 8px" @click="exportExcel" icon="cloud-download">导出</a-button> -->
             </span>
           </a-col>
@@ -65,7 +66,7 @@
         <span v-else>停用</span>
       </template>
     </s-table>
-    <a-modal v-model="addUserModal" title="编辑" @ok="handleOk" okText="确定" cancelText="取消">
+    <a-modal v-model="addGoodsModal" :title="modalTitle" @ok="handleOk" okText="确定" cancelText="取消">
       <a-form-model ref="addRoleForm" :model="form" :rules="rules" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-form-model-item label="姓名" prop="user_name">
           <a-input v-model="form.user_name" :maxLength="11"/>
@@ -73,9 +74,9 @@
         <a-form-model-item label="手机号" prop="tel">
           <a-input v-model="form.tel" :maxLength="11"/>
         </a-form-model-item>
-        <a-form-model-item label="地区" prop="area">
+        <!-- <a-form-model-item label="地区" prop="area">
           <a-cascader v-model="form.area" :options="areaOptions" :load-data="loadData" placeholder="地区"/>
-        </a-form-model-item>
+        </a-form-model-item> -->
         <a-form-model-item label="抵扣券" prop="coupon_money">
           <a-input-number :step="1" :min="0" :max="100000" :precision="2" v-model="form.coupon_money" />
         </a-form-model-item>
@@ -189,7 +190,7 @@ export default {
       // 添加框
       labelCol: { span: 4 },
       wrapperCol: { span: 18 },
-      addUserModal: false,
+      addGoodsModal: false,
       modalTitle: '新增用户',
       form: {
         user_name: '',
@@ -254,6 +255,13 @@ export default {
     },
     handleOk () {
       console.log(123)
+    },
+    showModal (goods = {}) {
+      console.log(goods)
+      if (goods) {
+        localStorage.setItem('goods', goods)
+      } else { localStorage.removeItem('goods') }
+      this.$router.push('/editGoods')
     }
   }
 }
